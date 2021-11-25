@@ -52,5 +52,41 @@ def get_post_by_id(post_id: int, db: Session = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Post with id={post_id} not found",
         )
-    
+
     return post
+
+
+# update a post by post id
+@app.put("/api/update-post/{post_id}")
+def update_post(post_id: int, post: Post, db: Session = Depends(get_db)):
+    update_query = db.query(models.Post).filter(models.Post.id == post_id)
+    xPost = update_query.first()
+    if not xPost:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Post with id={post_id} not found",
+        )
+
+    update_query.update(post.dict(), synchronize_session=False)
+
+    db.commit()
+
+    return update_query.first()
+
+
+# delete a specific post
+@app.delete("/api/delete/{post_id}")
+def delete_post(post_id: int, db: Session = Depends(get_db)):
+    delete_query = db.query(models.Post).filter(models.Post.id == post_id)
+    deletedPost = delete_query.first()
+
+    if not deletedPost:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Post with id={post_id} not found",
+        )
+    
+    delete_query.delete()
+    db.commit()
+
+    return {'message': 'Post deleted'}
