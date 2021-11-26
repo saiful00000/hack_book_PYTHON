@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI, Depends, Response, status, HTTPException
 from sqlalchemy.orm import Session
 
+from . import schemas
 from . import models
 from .database import engine, get_db
 
@@ -13,14 +14,8 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# # pydantic post model
-class Post(BaseModel):
-    title: str
-    content: str
-    published: Optional[bool] = True
 
-
-# # root
+# root
 @app.get("/")
 def root():
     return {"data": "Welcome to hackbook"}
@@ -34,8 +29,8 @@ def get_all_posts(db: Session = Depends(get_db)):
 
 
 # create a new post
-@app.post("/api/create-post", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post, db: Session = Depends(get_db)):
+@app.post("/api/create-post", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
+def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
     new_post = models.Post(**post.dict())
     db.add(new_post)
     db.commit()
@@ -44,7 +39,7 @@ def create_post(post: Post, db: Session = Depends(get_db)):
 
 
 # get specific post by id
-@app.get("/api/get-post/{post_id}")
+@app.get("/api/get-post/{post_id}", response_model=schemas.PostResponse)
 def get_post_by_id(post_id: int, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
     if not post:
@@ -57,8 +52,8 @@ def get_post_by_id(post_id: int, db: Session = Depends(get_db)):
 
 
 # update a post by post id
-@app.put("/api/update-post/{post_id}")
-def update_post(post_id: int, post: Post, db: Session = Depends(get_db)):
+@app.put("/api/update-post/{post_id}", response_model=schemas.PostResponse)
+def update_post(post_id: int, post: schemas.PostBase, db: Session = Depends(get_db)):
     update_query = db.query(models.Post).filter(models.Post.id == post_id)
     xPost = update_query.first()
     if not xPost:

@@ -7,6 +7,8 @@ from sqlalchemy.sql.expression import text
 from .database import Base
 
 
+# this is the sqlalchemy model
+# this model represents posts table in database
 class Post(Base):
     __tablename__ = "posts"
 
@@ -15,3 +17,5 @@ class Post(Base):
     content = Column(String, nullable=False)
     published = Column(Boolean, server_default="TRUE", nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+
+
