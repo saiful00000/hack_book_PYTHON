@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
@@ -14,15 +14,30 @@ class PostCreate(PostBase):
     # all fields of its base class
     pass
 
-
-# the class for the response body
-# what ever we return from the database
-# those will converted to this model
+"""
+the class for the response body
+what ever we return from the database
+those will converted to this model
+"""
 class PostResponse(PostBase):
     id: int
     created_at: datetime
 
     # this snippet of code enable
     # the ability to convert to dictionary
+    class Config:
+        orm_mode = True
+
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr
+    password: str
+    created_at: datetime
+
     class Config:
         orm_mode = True

@@ -1,0 +1,20 @@
+
+{
+    "menu_id": "43",
+    "url": "javascript:void(0)",
+    "menu_name": "E-Services",
+    "childs": [
+        {
+            "menu_id": "47",
+            "url": "https://bangladesh.gov.bd/site/view/eservices/%E0%A6%85%E0%A6%A8%E0%A6%B2%E0%A6%BE%E0%A6%87%E0%A6%A8",
+            "menu_name": "Online Registration",
+            "childs": [
+                {
+                    "menu_id": "48",
+                    "url": "https://bangladesh.gov.bd/site/view/eservices/%E0%A6%A8%E0%A6%BF%E0%A7%9F%E0%A7%8B%E0%A6%97%20%E0%A6",
+                    "menu_name": "Recruitment"
+                }
+            ]
+        }
+    ]
+}
