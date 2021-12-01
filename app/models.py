@@ -1,11 +1,11 @@
 from sqlalchemy import Column, Boolean, Integer, String
+
 from sqlalchemy.engine import base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
 
 from .database import Base
-
 
 # this is the sqlalchemy model
 # this model represents posts table in database

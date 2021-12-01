@@ -36,7 +36,6 @@ class UserCreate(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: EmailStr
-    password: str
     created_at: datetime
 
     class Config:
