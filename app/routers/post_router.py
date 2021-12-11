@@ -2,14 +2,11 @@ from typing import List
 from fastapi import APIRouter, Depends, Response, status, HTTPException
 from sqlalchemy.orm import Session
 
-from .. import schemas, models, utils
+from .. import schemas, models, utils, oauth2
 from ..database import get_db
 
 
-router = APIRouter(
-    prefix='/api/posts',
-    tags=['Posts']
-)
+router = APIRouter(prefix="/posts", tags=["Posts"])
 
 # <----------------------------- get all posts --------------------------------------->
 @router.get("/get-all", response_model=List[schemas.PostResponse])
@@ -24,7 +21,12 @@ def get_all_posts(db: Session = Depends(get_db)):
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.PostResponse,
 )
-def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
+def create_post(
+    post: schemas.PostCreate,
+    db: Session = Depends(get_db),
+    token_data: schemas.TokenData = Depends(oauth2.get_current_user),
+):
+    print(f'token data = {token_data.dict()}')
     new_post = models.Post(**post.dict())
     db.add(new_post)
     db.commit()
