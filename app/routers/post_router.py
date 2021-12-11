@@ -10,7 +10,10 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 
 # <----------------------------- get all posts --------------------------------------->
 @router.get("/get-all", response_model=List[schemas.PostResponse])
-def get_all_posts(db: Session = Depends(get_db)):
+def get_all_posts(
+    db: Session = Depends(get_db),
+    token_data: schemas.TokenData = Depends(oauth2.get_current_user),
+):
     post_list = db.query(models.Post).all()
     return post_list
 
@@ -26,7 +29,7 @@ def create_post(
     db: Session = Depends(get_db),
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
 ):
-    print(f'token data = {token_data.dict()}')
+    print(f"token data = {token_data.dict()}")
     new_post = models.Post(**post.dict())
     db.add(new_post)
     db.commit()
@@ -36,7 +39,11 @@ def create_post(
 
 # <----------------------------get specific post by id ------------------------------->
 @router.get("/get/{post_id}", response_model=schemas.PostResponse)
-def get_post_by_id(post_id: int, db: Session = Depends(get_db)):
+def get_post_by_id(
+    post_id: int,
+    db: Session = Depends(get_db),
+    token_data: schemas.TokenData = Depends(oauth2.get_current_user),
+):
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
     if not post:
         raise HTTPException(
@@ -49,7 +56,12 @@ def get_post_by_id(post_id: int, db: Session = Depends(get_db)):
 
 # <--------------------------- update a post by post id ------------------------------>
 @router.put("/update/{post_id}", response_model=schemas.PostResponse)
-def update_post(post_id: int, post: schemas.PostBase, db: Session = Depends(get_db)):
+def update_post(
+    post_id: int,
+    post: schemas.PostBase,
+    db: Session = Depends(get_db),
+    token_data: schemas.TokenData = Depends(oauth2.get_current_user),
+):
     update_query = db.query(models.Post).filter(models.Post.id == post_id)
     xPost = update_query.first()
     if not xPost:
@@ -67,7 +79,11 @@ def update_post(post_id: int, post: schemas.PostBase, db: Session = Depends(get_
 
 # <---------------------------- delete a specific post ------------------------------->
 @router.delete("/delete/{post_id}")
-def delete_post(post_id: int, db: Session = Depends(get_db)):
+def delete_post(
+    post_id: int,
+    db: Session = Depends(get_db),
+    token_data: schemas.TokenData = Depends(oauth2.get_current_user),
+):
     delete_query = db.query(models.Post).filter(models.Post.id == post_id)
     deletedPost = delete_query.first()
 

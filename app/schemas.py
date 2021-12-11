@@ -48,6 +48,7 @@ class LoginRequesat(BaseModel):
 
 
 class TokenResponse(BaseModel):
+    message: str
     access_token: str
     token_type: str
 
