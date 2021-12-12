@@ -14,6 +14,7 @@ def get_all_posts(
     db: Session = Depends(get_db),
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
 ):
+    print(f'token data from get all posts {token_data}')
     post_list = db.query(models.Post).all()
     return post_list
 
