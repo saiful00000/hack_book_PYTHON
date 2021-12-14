@@ -30,8 +30,11 @@ def create_post(
     db: Session = Depends(get_db),
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
 ):
+
+    post_dict = post.dict()
+    post_dict['woner_id'] = token_data.id
     print(f"token data = {token_data.dict()}")
-    new_post = models.Post(**post.dict())
+    new_post = models.Post(**post_dict)
     db.add(new_post)
     db.commit()
     db.refresh(new_post)

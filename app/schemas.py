@@ -21,6 +21,7 @@ those will converted to this model
 """
 class PostResponse(PostBase):
     id: int
+    woner_id: int
     created_at: datetime
 
     # this snippet of code enable
