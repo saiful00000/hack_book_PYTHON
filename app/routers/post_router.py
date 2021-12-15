@@ -9,7 +9,7 @@ from ..database import get_db
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 # <----------------------------- get all posts --------------------------------------->
-@router.get("/get-all", response_model=List[schemas.PostResponse])
+@router.get("/get-all")
 def get_all_posts(
     db: Session = Depends(get_db),
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
@@ -74,6 +74,12 @@ def update_post(
             detail=f"Post with id={post_id} not found",
         )
 
+    if xPost.woner_id != int(token_data.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f'The post you are trying to edit, its not belongs to you',
+        )
+
     update_query.update(post.dict(), synchronize_session=False)
 
     db.commit()
@@ -95,6 +101,12 @@ def delete_post(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Post with id={post_id} not found",
+        )
+
+    if deletedPost.woner_id != int(token_data.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f'The post you are trying to delete its not belongs to you',
         )
 
     delete_query.delete()
