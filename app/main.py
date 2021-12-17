@@ -1,14 +1,7 @@
-from typing import Optional, List
+from fastapi import FastAPI
 
-from pydantic import BaseModel
-
-from fastapi import FastAPI, Depends, Response, status, HTTPException
-from sqlalchemy.orm import Session
-
-from . import schemas
 from . import models
-from . import utils
-from .database import engine, get_db
+from .database import engine
 
 from .routers import user_router, post_router, auth_router
 

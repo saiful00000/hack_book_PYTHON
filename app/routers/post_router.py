@@ -9,15 +9,30 @@ from ..database import get_db
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 # <----------------------------- get all posts --------------------------------------->
-@router.get("/get-all")
+@router.get("/get-all", response_model=List[schemas.PostResponse])
 def get_all_posts(
     db: Session = Depends(get_db),
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
 ):
-    print(f'token data from get all posts {token_data}')
+    print(f"token data from get all posts {token_data}")
     post_list = db.query(models.Post).all()
     return post_list
 
+
+# <------------------------------ Get My all posts ------------------------------------>
+@router.get("/get-my-all", response_model=List[schemas.PostResponse])
+def get_my_all_posts(
+    db: Session = Depends(get_db),
+    token_data: schemas.TokenData = Depends(oauth2.get_current_user),
+    limit: int = None,
+):
+    if limit:
+        # excecute when user send the limit by query parameter
+        m_posts_list = db.query(models.Post).filter(str(token_data.id) == models.Post.woner_id).limit(limit).all()
+    else:
+        # get all posts there isno limit
+        m_posts_list = db.query(models.Post).filter(str(token_data.id) == models.Post.woner_id).all()
+    return m_posts_list
 
 # <============================= create a new post ----------------------------------->
 @router.post(
@@ -32,7 +47,7 @@ def create_post(
 ):
 
     post_dict = post.dict()
-    post_dict['woner_id'] = token_data.id
+    post_dict["woner_id"] = token_data.id
     print(f"token data = {token_data.dict()}")
     new_post = models.Post(**post_dict)
     db.add(new_post)
@@ -77,7 +92,7 @@ def update_post(
     if xPost.woner_id != int(token_data.id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f'The post you are trying to edit, its not belongs to you',
+            detail=f"The post you are trying to edit, its not belongs to you",
         )
 
     update_query.update(post.dict(), synchronize_session=False)
@@ -106,7 +121,7 @@ def delete_post(
     if deletedPost.woner_id != int(token_data.id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f'The post you are trying to delete its not belongs to you',
+            detail=f"The post you are trying to delete its not belongs to you",
         )
 
     delete_query.delete()
