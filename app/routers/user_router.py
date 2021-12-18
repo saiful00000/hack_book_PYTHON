@@ -2,13 +2,10 @@ from typing import List
 from fastapi import APIRouter, Depends, Response, status, HTTPException
 from sqlalchemy.orm import Session
 
-from .. import schemas, models, utils 
+from .. import schemas, models, utils
 from ..database import get_db
 
-router = APIRouter(
-    prefix='/users',
-    tags=['Users']
-)
+router = APIRouter(prefix="/users", tags=["Users"])
 
 # <---------------------------- create user ---------------------------------->
 @router.post(
@@ -22,7 +19,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if x_email:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f'This email has already registered',
+            detail=f"This email has already registered",
         )
 
     # grnerate hash of given password
@@ -42,15 +39,16 @@ def get_all_users(db: Session = Depends(get_db)):
     user_list = db.query(models.User).all()
     return user_list
 
+
 # <--------------------------- get user by id ---------------------------------------->
-@router.get('/get/{user_id}', response_model=schemas.UserResponse)
+@router.get("/get/{user_id}", response_model=schemas.UserResponse)
 def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == user_id).first()
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'User not found',
+            detail=f"User not found",
         )
-    
+
     return user

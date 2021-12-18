@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
+from pydantic.types import conint
 
 
 """
@@ -62,8 +63,7 @@ class PostCreate(PostBase):
 """
 the class for the response body
 what ever we return from the database
-those will converted to this model
-"""
+those will converted to this model"""
 
 
 class PostResponse(PostBase):
@@ -76,3 +76,16 @@ class PostResponse(PostBase):
     # the ability to convert to dictionary
     class Config:
         orm_mode = True
+
+
+"""
+the class represent the request body
+of make vote api
+"""
+
+
+class VoteRequest(BaseModel):
+    post_id: int
+    # this field represend whether the vote is
+    # an up vote or down vote
+    direction: conint(le=1)
