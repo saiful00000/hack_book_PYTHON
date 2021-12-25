@@ -77,6 +77,13 @@ class PostResponse(PostBase):
     class Config:
         orm_mode = True
 
+class PostWithVoteResponse(BaseModel):
+    Post: PostResponse
+    votes: int
+
+    class Config:
+        orm_mode = True
+
 
 """
 the class represent the request body
@@ -86,6 +93,6 @@ of make vote api
 
 class VoteRequest(BaseModel):
     post_id: int
-    # this field represend whether the vote is
+    # this field represent whether the vote is
     # an up vote or down vote
     direction: conint(le=1)

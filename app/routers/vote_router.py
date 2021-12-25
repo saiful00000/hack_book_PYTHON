@@ -15,6 +15,14 @@ def vote(
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
 ):
 
+    # fisrt of all we must check is the post exist or not
+    post = db.query(models.Post).filter(models.Post.id == vote.post_id).first()
+    if not post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Post does not exist',
+        )
+
     vote_query = db.query(models.Vote).filter(
         models.Vote.user_id == str(token_data.id), models.Vote.post_id == vote.post_id
     )

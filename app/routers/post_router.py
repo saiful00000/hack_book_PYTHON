@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, Response, status, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from .. import schemas, models, utils, oauth2
 from ..database import get_db
@@ -9,13 +10,28 @@ from ..database import get_db
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 # <----------------------------- get all posts --------------------------------------->
-@router.get("/get-all", response_model=List[schemas.PostResponse])
+@router.get("/get-all", response_model=List[schemas.PostWithVoteResponse])
+# @router.get("/get-all")
 def get_all_posts(
     db: Session = Depends(get_db),
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
 ):
     print(f"token data from get all posts {token_data}")
-    post_list = db.query(models.Post).all()
+    # post_list = db.query(models.Post).all()
+    post_list = (
+        db.query(
+            models.Post,
+            func.count(models.Vote.post_id).label("votes"),
+        )
+        .join(
+            models.Vote,
+            models.Vote.post_id == models.Post.id,
+            isouter=True,
+        )
+        .group_by(models.Post.id)
+        .all()
+    )
+
     return post_list
 
 
@@ -28,11 +44,21 @@ def get_my_all_posts(
 ):
     if limit:
         # excecute when user send the limit by query parameter
-        m_posts_list = db.query(models.Post).filter(str(token_data.id) == models.Post.woner_id).limit(limit).all()
+        m_posts_list = (
+            db.query(models.Post)
+            .filter(str(token_data.id) == models.Post.woner_id)
+            .limit(limit)
+            .all()
+        )
     else:
         # get all posts there isno limit
-        m_posts_list = db.query(models.Post).filter(str(token_data.id) == models.Post.woner_id).all()
+        m_posts_list = (
+            db.query(models.Post)
+            .filter(str(token_data.id) == models.Post.woner_id)
+            .all()
+        )
     return m_posts_list
+
 
 # <============================= create a new post ----------------------------------->
 @router.post(
