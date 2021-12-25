@@ -1,0 +1,10 @@
+to keep note of all required libraries those we used in our app
+we need to create an text file called requirements.txt, to do so
+use bellow command
+
+-> pip freeze > requirements.txt
+
+for installing all libraries those are documented in requirements.txt
+file we need to run bellow command
+
+-> pip install -r requirements.txt

@@ -36,7 +36,7 @@ def get_all_posts(
 
 
 # <------------------------------ Get My all posts ------------------------------------>
-@router.get("/get-my-all", response_model=List[schemas.PostResponse])
+@router.get("/get-my-all", response_model=List[schemas.PostWithVoteResponse])
 def get_my_all_posts(
     db: Session = Depends(get_db),
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
@@ -44,20 +44,50 @@ def get_my_all_posts(
 ):
     if limit:
         # excecute when user send the limit by query parameter
-        m_posts_list = (
-            db.query(models.Post)
-            .filter(str(token_data.id) == models.Post.woner_id)
+        # m_posts_list = (
+        #     db.query(models.Post,)
+        #     .filter(str(token_data.id) == models.Post.woner_id)
+        #     .limit(limit)
+        #     .all()
+        # )
+        m_post_list = (
+            db.query(
+                models.Post,
+                func.count(models.Vote.post_id).label("votes"),
+            )
+            .join(
+                models.Vote,
+                models.Vote.post_id == models.Post.id,
+                isouter=True,
+            )
+            .group_by(models.Post.id)
+            .filter(models.Post.woner_id == str(token_data.id))
             .limit(limit)
             .all()
         )
     else:
         # get all posts there isno limit
-        m_posts_list = (
-            db.query(models.Post)
-            .filter(str(token_data.id) == models.Post.woner_id)
+        # m_posts_list = (
+        #     db.query(models.Post)
+        #     .filter(str(token_data.id) == models.Post.woner_id)
+        #     .all()
+        # )
+        m_post_list = (
+            db.query(
+                models.Post,
+                func.count(models.Vote.post_id).label("votes"),
+            )
+            .join(
+                models.Vote,
+                models.Vote.post_id == models.Post.id,
+                isouter=True,
+            )
+            .group_by(models.Post.id)
+            .filter(models.Post.woner_id == str(token_data.id))
             .all()
         )
-    return m_posts_list
+
+    return m_post_list
 
 
 # <============================= create a new post ----------------------------------->
@@ -82,14 +112,29 @@ def create_post(
     return new_post
 
 
-# <----------------------------get specific post by id ------------------------------->
-@router.get("/get/{post_id}", response_model=schemas.PostResponse)
+# <---------------------------- get specific post by id ------------------------------->
+@router.get("/get/{post_id}", response_model=schemas.PostWithVoteResponse)
 def get_post_by_id(
     post_id: int,
     db: Session = Depends(get_db),
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
 ):
-    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    # post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    post = (
+        db.query(
+            models.Post,
+            func.count(models.Vote.post_id).label("votes"),
+        )
+        .join(
+            models.Vote,
+            models.Vote.post_id == models.Post.id,
+            isouter=True,
+        )
+        .group_by(models.Post.id)
+        .filter(models.Post.id == post_id)
+        .first()
+    )
+
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
