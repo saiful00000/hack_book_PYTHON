@@ -1,0 +1,8 @@
+* heroku deployment
+
+1. create an account to heroku
+2. download heroku CLI from heroku website
+3. cmd: (heroku login) to login into heroku
+4. cmd: (heroku create app-name) to create an heroku app
+5. cmd: (git push heroku master) to deploy our application to heroku
+6. in your root directory create an file named "Procfile" (name should be capitalized)
