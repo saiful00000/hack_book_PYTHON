@@ -6,3 +6,4 @@
 4. cmd: (heroku create app-name) to create an heroku app
 5. cmd: (git push heroku master) to deploy our application to heroku
 6. in your root directory create an file named "Procfile" (name should be capitalized)
+7. cmd: (heroku addons:create heroku-postgresql:hobby-dev) install prostgres to heroku (create a postgres instance)
