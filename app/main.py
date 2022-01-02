@@ -19,4 +19,4 @@ app.include_router(vote_router.router)
 # root ---------------------------------------------------------------------
 @app.get("/")
 def root():
-    return {"data": "Welcome to HackBook"}
+    return {"data": "Welcome to App"}
