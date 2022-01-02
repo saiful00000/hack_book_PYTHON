@@ -1,0 +1,2 @@
+1. generate requirement.txt file 
+cmd: pip freeze > requirements.txt
