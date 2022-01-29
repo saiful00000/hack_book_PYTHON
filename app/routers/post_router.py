@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, Response, status, HTTPException
+from fastapi import APIRouter, Depends, Response, status, HTTPException, Form
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
@@ -97,7 +97,7 @@ def get_my_all_posts(
     response_model=schemas.PostResponse,
 )
 def create_post(
-    post: schemas.PostCreate,
+    post: schemas.PostCreate = Form(...),
     db: Session = Depends(get_db),
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
 ):
