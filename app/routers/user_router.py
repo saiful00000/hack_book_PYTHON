@@ -8,29 +8,30 @@ from ..database import get_db
 router = APIRouter(prefix="/users", tags=["Users"])
 
 # <---------------------------- create user ---------------------------------->
-@router.post(
-    "/create",
-    response_model=schemas.UserResponse,
-    status_code=status.HTTP_201_CREATED,
-)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    # check whether email already exist
-    x_email = db.query(models.User).filter(user.email == models.User.email).first()
-    if x_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"This email has already registered",
-        )
+# moved to authe route as registration route
+# @router.post(
+#     "/create",
+#     response_model=schemas.UserResponse,
+#     status_code=status.HTTP_201_CREATED,
+# )
+# def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+#     # check whether email already exist
+#     x_email = db.query(models.User).filter(user.email == models.User.email).first()
+#     if x_email:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail=f"This email has already registered",
+#         )
 
-    # grnerate hash of given password
-    hashed_password = utils.get_hash_from_str(user.password)
-    user.password = hashed_password
+#     # grnerate hash of given password
+#     hashed_password = utils.get_hash_from_str(user.password)
+#     user.password = hashed_password
 
-    created_user = models.User(**user.dict())
-    db.add(created_user)
-    db.commit()
-    db.refresh(created_user)
-    return created_user
+#     created_user = models.User(**user.dict())
+#     db.add(created_user)
+#     db.commit()
+#     db.refresh(created_user)
+#     return created_user
 
 
 # <--------------------------- get all users ---------------------------------------->

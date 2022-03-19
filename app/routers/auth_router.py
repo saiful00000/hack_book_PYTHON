@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status, HTTPException, APIRouter, Depends
+from fastapi import FastAPI, status, HTTPException, APIRouter, Depends, Form
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import user
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
@@ -15,9 +15,40 @@ router = APIRouter(
 )
 
 
+@router.post(
+    "/register-user",
+    response_model=schemas.UserResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def register(
+    # user: schemas.UserCreate = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    # cheack whether email exist or not
+    x_email = db.query(models.User).filter(email == models.User.email).first()
+    if x_email:
+        return HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"This email has already registered",
+        )
+
+    # generate hash of given password
+    hashed_password = utils.get_hash_from_str(password)
+    password = hashed_password
+    created_user = models.User(email=email, password=password)
+    db.add(created_user)
+    db.commit()
+    db.refresh(created_user)
+    return created_user
+
+
 @router.post("/login", response_model=schemas.TokenResponse)
 def login(cred: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user_from_db = db.query(models.User).filter(models.User.email == cred.username).first()
+    user_from_db = (
+        db.query(models.User).filter(models.User.email == cred.username).first()
+    )
 
     # check existance
     if not user_from_db:
