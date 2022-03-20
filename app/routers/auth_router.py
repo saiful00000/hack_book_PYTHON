@@ -22,6 +22,7 @@ router = APIRouter(
 )
 def register(
     # user: schemas.UserCreate = Form(...),
+    user_name: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db),
@@ -37,7 +38,7 @@ def register(
     # generate hash of given password
     hashed_password = utils.get_hash_from_str(password)
     password = hashed_password
-    created_user = models.User(email=email, password=password)
+    created_user = models.User(email=email, password=password, user_name=user_name)
     db.add(created_user)
     db.commit()
     db.refresh(created_user)

@@ -18,6 +18,8 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     id: int
+    user_name: str
+    profile_picture: str
     email: EmailStr
     created_at: datetime
 

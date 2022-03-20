@@ -1,37 +1,40 @@
 from typing import List
-from fastapi import APIRouter, Depends, Response, status, HTTPException
+from fastapi import APIRouter, Depends, File, Form, Response, status, HTTPException
 from sqlalchemy.orm import Session
 
-from .. import schemas, models, utils
+from .. import schemas, models, utils, oauth2
 from ..database import get_db
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-# <---------------------------- create user ---------------------------------->
-# moved to authe route as registration route
-# @router.post(
-#     "/create",
-#     response_model=schemas.UserResponse,
-#     status_code=status.HTTP_201_CREATED,
-# )
-# def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-#     # check whether email already exist
-#     x_email = db.query(models.User).filter(user.email == models.User.email).first()
-#     if x_email:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail=f"This email has already registered",
-#         )
 
-#     # grnerate hash of given password
-#     hashed_password = utils.get_hash_from_str(user.password)
-#     user.password = hashed_password
+# <--------------------------- upload profile image --------------------------------->
+@router.put("/upload/profile-picture")
+def upload_profile_picture(
+    profile_picture: bytes = File(...),
+    db: Session = Depends(get_db),
+    token_data: schemas.TokenData = Depends(oauth2.get_current_user),
+):
+    new_query = db.query(models.User).filter(token_data.id == models.User.id)
+    x_user_data = new_query.first()
+    
+    # check whther user exist or not
+    if not x_user_data:
+        return HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    
+    # recheck whther user is the valid user
+    if x_user_data.id != token_data.id:
+        return HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='The request is forbiden',
+        )
+    
+    return {'file_size': len(profile_picture)}
 
-#     created_user = models.User(**user.dict())
-#     db.add(created_user)
-#     db.commit()
-#     db.refresh(created_user)
-#     return created_user
+
 
 
 # <--------------------------- get all users ---------------------------------------->
