@@ -25,8 +25,10 @@ def upload_profile_picture(
             detail="User not found",
         )
     
+    print(f'user id = {x_user_data.id} token_id = {token_data.id}')
+    
     # recheck whther user is the valid user
-    if x_user_data.id != token_data.id:
+    if str(x_user_data.id) != token_data.id:
         return HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail='The request is forbiden',
