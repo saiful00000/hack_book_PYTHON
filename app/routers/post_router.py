@@ -167,7 +167,6 @@ def update_post(
         )
 
     update_query.update(post.dict(), synchronize_session=False)
-
     db.commit()
 
     return update_query.first()

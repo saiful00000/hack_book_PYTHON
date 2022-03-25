@@ -20,7 +20,7 @@ def vote(
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Post does not exist',
+            detail="Post does not exist",
         )
 
     vote_query = db.query(models.Vote).filter(
@@ -35,7 +35,7 @@ def vote(
         if vote_from_db:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"Alrady voted to this post",
+                detail="Alrady voted to this post",
             )
         # if the vote is not already counted
         new_vote = models.Vote(user_id=token_data.id, post_id=vote.post_id)
@@ -48,7 +48,7 @@ def vote(
         if not vote_from_db:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Post not counted before, so can not remove vote",
+                detail="Post not counted before, so can not remove vote",
             )
 
         vote_query.delete()
