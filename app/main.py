@@ -20,4 +20,4 @@ app.mount("/profile_pictures", StaticFiles(directory="profile_pictures"), name="
 # root ---------------------------------------------------------------------
 @app.get("/")
 def root():
-    return {"data": "Welcome to App"}
+    return {"data": "Welcome to App v2"}
