@@ -49,6 +49,8 @@ class TokenData(BaseModel):
 This group of pydantic models are defination of all post related
 schemas
 """
+
+
 # the base class for Post
 class PostBase(BaseModel):
     title: str

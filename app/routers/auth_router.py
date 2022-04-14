@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status, HTTPException, APIRouter, Depends, Form
+from fastapi import FastAPI, status, HTTPException, APIRouter, Depends, Form, Response
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import user
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
@@ -17,8 +17,6 @@ router = APIRouter(
 
 @router.post(
     "/register-user",
-    response_model=schemas.UserResponse,
-    status_code=status.HTTP_201_CREATED,
 )
 def register(
     # user: schemas.UserCreate = Form(...),
@@ -26,10 +24,12 @@ def register(
     email: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db),
+    res: Response = Response,
 ):
     # cheack whether email exist or not
     x_email = db.query(models.User).filter(email == models.User.email).first()
     if x_email:
+        res.status_code = status.HTTP_400_BAD_REQUEST
         return HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"This email has already registered",

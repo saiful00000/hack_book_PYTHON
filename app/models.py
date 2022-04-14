@@ -8,6 +8,7 @@ from sqlalchemy.sql.expression import false, text
 
 from .database import Base
 
+
 # this is the sqlalchemy model
 # this model represents posts table in database
 class Post(Base):
@@ -35,7 +36,12 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     user_name = Column(String, unique=False, nullable=False)
-    profile_picture = Column(String, unique=True, nullable=False, server_default="")
+    profile_picture = Column(
+        String,
+        unique=False,
+        nullable=False,
+        server_default="",
+    )
     email = Column(String, unique=True)
     password = Column(String, nullable=False)
     created_at = Column(

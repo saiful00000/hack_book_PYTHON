@@ -97,7 +97,7 @@ def get_my_all_posts(
     response_model=schemas.PostResponse,
 )
 def create_post(
-    post: schemas.PostCreate = Form(...),
+    post: schemas.PostCreate,
     db: Session = Depends(get_db),
     token_data: schemas.TokenData = Depends(oauth2.get_current_user),
 ):
